@@ -99,4 +99,4 @@ This guide outlines the steps to deploy the MockUSDC and TokenVault contracts lo
 - Replace placeholders like `[TOKENVAULT_CONTRACT_ADDRESS]` with actual contract addresses.
 - For deploying on the testnet, ensure your wallet is configured correctly and you have testnet MATIC.
 - If you're interested in learnng more about ERC-4626, make sure you read this 
-- The following article has been developed in conjunction with the repository,[ERC-4626: The L2 DeFi Lifeline](https://mirror.xyz/dashboard/edit/AKb8MB8IVzVHp4ppSmJ9M03dyoxASgBO0_7TsGlxxKg).
+- The following article has been developed in conjunction with the repository, [ERC-4626: The L2 DeFi Lifeline](https://mirror.xyz/dashboard/edit/AKb8MB8IVzVHp4ppSmJ9M03dyoxASgBO0_7TsGlxxKg).
