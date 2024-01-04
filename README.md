@@ -1,66 +1,102 @@
-## Foundry
+# ERC-4626 Token Vault Deployment Guide
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This guide outlines the steps to deploy the MockUSDC and TokenVault contracts locally using Foundry and on the Polygon zkEVM Testnet.
 
-Foundry consists of:
+## Overview
+- **MockUSDC**: An ERC-20 compliant mock token. Upon deployment, the deployer is minted 100 mUSDC tokens.
+- **TokenVault**: An ERC-4626 compliant token vault contract.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Initial Setup
+1. **Clone the Repository**:
+   ```shell
+   git clone https://github.com/finessevanes/erc4626-demo.git
+   ```
 
-## Documentation
+2. **Navigate to the Project Directory**:
+   ```shell
+   cd erc4626-demo
+   ```
 
-https://book.getfoundry.sh/
+3. **Build the Assets**:
+   ```shell
+   forge build
+   ```
 
-## Usage
+4. **Compile Contracts**:
+   ```shell
+   forge compile
+   ```
 
-### Build
+## Deploying Locally
 
-```shell
-$ forge build
-```
+1. **Start Local Development Environment**:
+   ```shell
+   anvil
+   ```
+   - Note the public and private keys provided.
 
-### Test
+2. **Create and Configure .env File**:
+   - Create a `.env` file in the project root:
+     ```shell
+     touch .env
+     ```
+   - Add the private key and RPC URL:
+     ```
+     ANVIL_PRIVATE_KEY=0x...
+     ANVIL_PUBLIC_KEY=0x...
+     ANVIL_RPC=http://127.0.0.1:8545
+     ```
 
-```shell
-$ forge test
-```
+3. **Load Environment Variables**:
+   ```shell
+   source .env
+   ```
 
-### Format
+4. **Deploy MockUSDC Contract**:
+   ```shell
+   forge create --rpc-url $ANVIL_RPC --private-key $ANVIL_PRIVATE_KEY MockUSDC
+   ```
+   - Save the contract address for later use.
 
-```shell
-$ forge fmt
-```
+5. **Deploy TokenVault Contract**:
+   ```shell
+   forge create --rpc-url $ANVIL_RPC --private-key $ANVIL_PRIVATE_KEY src/TokenVault.sol:TokenVault --constructor-args $ANVIL_MOCKUSDC_ADDRESS "MockUSDC" "mUSDC"
+   ```
 
-### Gas Snapshots
+6. **Approve Spending Limit**:
+   ```shell
+   cast send --rpc-url $ANVIL_RPC --private-key $ANVIL_PRIVATE_KEY $ANVIL_MOCKUSDC_ADDRESS "approve(address, uint256)" [TOKENVAULT_CONTRACT_ADDRESS] 200000000000000000000
+   ```
 
-```shell
-$ forge snapshot
-```
+7. **Make a Deposit in TokenVault**:
+   ```shell
+   cast send --rpc-url $ANVIL_RPC --private-key $ANVIL_PRIVATE_KEY [TOKENVAULT_CONTRACT_ADDRESS] "customDeposit(uint256)" 50000000000000000000
+   ```
 
-### Anvil
+8. **Make a Withdraw in TokenVault**:
+   ```shell
+   cast send --rpc-url $ANVIL_RPC --private-key $ANVIL_PRIVATE_KEY [TOKENVAULT_CONTRACT_ADDRESS] "customWithdraw(uint256, address)" 50000000000000000000 $ANVIL_PUBLIC_KEY
+   ```
 
-```shell
-$ anvil
-```
+## Deploying on Polygon zkEVM Testnet
 
-### Deploy
+1. **Configure for Polygon zkEVM Testnet**:
+   - Update `.env` with your private key and Polygon zkEVM Testnet RPC URL.
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+2. **Deploy MockUSDC Contract on Testnet**:
+   ```shell
+   forge create --rpc-url $POLYGON_ZKEVM_RPC --private-key $PRIVATE_KEY MockUSDC
+   ```
+   - Save the contract address for TokenVault deployment.
 
-### Cast
+3. **Deploy TokenVault Contract on Testnet**:
+   ```shell
+   forge create --rpc-url $POLYGON_ZKEVM_RPC --private-key $PRIVATE_KEY src/TokenVault.sol:TokenVault --constructor-args [MOCKUSDC_CONTRACT_ADDRESS] "MockUSDC" "mUSDC"
+   ```
 
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+## Notes
+- Ensure you have enough MATIC for gas fees on the Polygon zkEVM Testnet.
+- Replace placeholders like `[TOKENVAULT_CONTRACT_ADDRESS]` with actual contract addresses.
+- For deploying on the testnet, ensure your wallet is configured correctly and you have testnet MATIC.
+- If you're interested in learnng more about ERC-4626, make sure you read this 
+- The following article has been developed in conjunction with the repository,[ERC-4626: The L2 DeFi Lifeline](https://mirror.xyz/dashboard/edit/AKb8MB8IVzVHp4ppSmJ9M03dyoxASgBO0_7TsGlxxKg).
