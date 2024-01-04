@@ -40,7 +40,7 @@ This guide outlines the steps to deploy the MockUSDC and TokenVault contracts lo
      ```shell
      touch .env
      ```
-   - Add the private key and RPC URL:
+   - Add the private, public key and RPC URL:
      ```
      ANVIL_PRIVATE_KEY=0x...
      ANVIL_PUBLIC_KEY=0x...
